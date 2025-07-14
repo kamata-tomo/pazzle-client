@@ -19,7 +19,7 @@ public class TitleManagerScript : MonoBehaviour
     public void GoToHomeScene()
     {
         // ランキングシーンにフェード
-        Initiate.Fade("HomeScenes", Color.black, 1.0f);
+        Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
 
 }

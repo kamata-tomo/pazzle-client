@@ -58,7 +58,12 @@ public class StageSelectManager : MonoBehaviour
     public void GoToSetiing()
     {
         SetiingManagerScript.SceneReturnTarget = SceneManager.GetActiveScene().name;
-        Initiate.Fade("SettingScene", Color.black, 1.0f);
+        Initiate.Fade("SettingScene", Color.black, 0.5f);
+    }
+
+    public void ReturnHome()
+    {
+        Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
 }
 

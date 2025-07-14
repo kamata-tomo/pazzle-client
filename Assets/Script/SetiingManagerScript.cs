@@ -19,6 +19,6 @@ public class SetiingManagerScript : MonoBehaviour
 
     public void ReturnScene()
     {
-        Initiate.Fade(SceneReturnTarget, Color.black, 1.0f);
+        Initiate.Fade(SceneReturnTarget, Color.black, 0.5f);
     }
 }
