@@ -6,44 +6,56 @@ using UnityEngine.SceneManagement;
 public class SlidePuzzleSceneDirector : MonoBehaviour
 {
     // ピース
-    [SerializeField] List<GameObject> pieces;
+    [SerializeField] List<GameObject> pieceList;
+    [SerializeField] GameObject ParentPieces;
     // ゲームクリア時に表示されるボタン
-    [SerializeField] GameObject buttonRetry;
+    [SerializeField] public GameObject buttonRetry;
     // シャッフル回数
-    [SerializeField] int shuffleCount;
+    [SerializeField] public int shuffleCount;
 
-    // 初期位置
-    List<Vector2> startPositions;
+    List<GameObject> children;
+
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        // 初期位置を保存
-        startPositions = new List<Vector2>();
-        foreach (var item in pieces)
+        for (int i = 0; i < 4; i++)
         {
-            startPositions.Add(item.transform.position);
+            for(int j = 0; j < 4; j++)
+            {
+                if (i != 3 || j != 3)
+                {
+                    Object.Instantiate(pieceList[Random.Range(0, 6)], new Vector3(-1.5f + i, 1.5f - j, 0f), Quaternion.identity, ParentPieces.transform);
+                }
+            }
         }
+        children = new List<GameObject>();
 
+        foreach (Transform child in ParentPieces.transform)
+        {
+            children.Add(child.gameObject);
+        }
         // 指定回数シャッフル
         for (int i = 0; i < shuffleCount; i++)
         {
             // 0番と隣接するピース
-            List<GameObject> movablePieces = new List<GameObject>();
+            List<GameObject> movablepieceList = new List<GameObject>();
 
             // 0番と隣接するピースをリストに追加
-            foreach (var item in pieces)
+            foreach (var item in pieceList)
             {
                 if (GetEmptyPiece(item) != null)
                 {
-                    movablePieces.Add(item);
+                    movablepieceList.Add(item);
                 }
             }
-
+            
             // 隣接するピースをランダムで入れかえる
-            int rnd = Random.Range(0, movablePieces.Count);
-            GameObject piece = movablePieces[rnd];
-            SwapPiece(piece, pieces[0]);
+            int rnd = Random.Range(0, movablepieceList.Count);
+            GameObject piece = movablepieceList[rnd];
+            SwapPiece(piece, pieceList[0]);
         }
 
         // ボタン非表示
@@ -75,15 +87,14 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
                 buttonRetry.SetActive(true);
 
                 // 正解の位置と違うピースを探す
-                for (int i = 0; i < pieces.Count; i++)
+                for (int i = 0; i < pieceList.Count; i++)
                 {
                     // 現在のポジション
-                    Vector2 position = pieces[i].transform.position;
+                    Vector2 position = pieceList[i].transform.position;
                     // 初期位置と違ったらボタンを非表示
-                    if(position != startPositions[i])
-                    {
+
                         buttonRetry.SetActive(false);
-                    }
+                    
                 }
 
                 // クリア状態
@@ -102,12 +113,12 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     {
         // 2点間の距離を代入
         float dist =
-            Vector2.Distance(piece.transform.position, pieces[0].transform.position);
+            Vector2.Distance(piece.transform.position, pieceList[0].transform.position);
 
         // 距離が1なら0番のピースを返す（2個以上離れていたり、斜めの場合は1より大きい距離になる）
         if (dist == 1)
         {
-            return pieces[0];
+            return pieceList[0];
         }
 
         return null;
