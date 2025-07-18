@@ -2,16 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Piece;
 
 public class SlidePuzzleSceneDirector : MonoBehaviour
 {
     // ピース
     [SerializeField] List<GameObject> pieceList;
     [SerializeField] GameObject ParentPieces;
+    [SerializeField] GameObject StartPiece;
+    [SerializeField] GameObject GoalPiece;
     // ゲームクリア時に表示されるボタン
-    [SerializeField] public GameObject buttonRetry;
+    [SerializeField]  GameObject buttonRetry;
+    [SerializeField] GameObject buttonStart;
     // シャッフル回数
-    [SerializeField] public int shuffleCount;
+    [SerializeField]  int shuffleCount;
+    [SerializeField] Player player;
 
     List<GameObject> children;
 
@@ -21,6 +26,8 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        buttonRetry.SetActive(false);
+        buttonStart.SetActive(true);
         for (int i = 0; i < 4; i++)
         {
             for(int j = 0; j < 4; j++)
@@ -41,32 +48,33 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
         for (int i = 0; i < shuffleCount; i++)
         {
             // 0番と隣接するピース
-            List<GameObject> movablepieceList = new List<GameObject>();
+            List<GameObject> movablechildren = new List<GameObject>();
 
             // 0番と隣接するピースをリストに追加
-            foreach (var item in pieceList)
+            foreach (var item in children)
             {
                 if (GetEmptyPiece(item) != null)
                 {
-                    movablepieceList.Add(item);
+                    movablechildren.Add(item);
                 }
             }
             
             // 隣接するピースをランダムで入れかえる
-            int rnd = Random.Range(0, movablepieceList.Count);
-            GameObject piece = movablepieceList[rnd];
-            SwapPiece(piece, pieceList[0]);
+            int rnd = Random.Range(0, movablechildren.Count);
+            GameObject piece = movablechildren[rnd];
+            SwapPiece(piece, children[0]);
         }
 
-        // ボタン非表示
-        buttonRetry.SetActive(false);
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        buttonRetry.SetActive(player.Fail);
+        buttonStart.SetActive(player.ReadyToStart);
         // タッチ処理
-        if(Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButton(0))
         {
             // スクリーン座標からワールド座標に変換
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -74,7 +82,7 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
             RaycastHit2D hit2d = Physics2D.Raycast(worldPoint, Vector2.zero);
 
             // 当たり判定があった
-            if(hit2d)
+            if (hit2d && hit2d.collider.gameObject.tag == "piece")
             {
                 // ヒットしたゲームオブジェクト
                 GameObject hitPiece = hit2d.collider.gameObject;
@@ -83,26 +91,7 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
                 // 選んだピースと0番のピースを入れかえる
                 SwapPiece(hitPiece, emptyPiece);
 
-                // クリア判定
-                buttonRetry.SetActive(true);
 
-                // 正解の位置と違うピースを探す
-                for (int i = 0; i < pieceList.Count; i++)
-                {
-                    // 現在のポジション
-                    Vector2 position = pieceList[i].transform.position;
-                    // 初期位置と違ったらボタンを非表示
-
-                        buttonRetry.SetActive(false);
-                    
-                }
-
-                // クリア状態
-                if(buttonRetry.activeSelf)
-                {
-                    Debug.Log("クリア！！");
-                    buttonRetry.SetActive(true);
-                }
             }
         }
         
@@ -113,12 +102,12 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     {
         // 2点間の距離を代入
         float dist =
-            Vector2.Distance(piece.transform.position, pieceList[0].transform.position);
+            Vector2.Distance(piece.transform.position, children[0].transform.position);
 
         // 距離が1なら0番のピースを返す（2個以上離れていたり、斜めの場合は1より大きい距離になる）
         if (dist == 1)
         {
-            return pieceList[0];
+            return children[0];
         }
 
         return null;
@@ -142,6 +131,31 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     // リトライボタン
     public void OnClickRetry()
     {
-        SceneManager.LoadScene("SlidePuzzleScene");
+
+        player.Retry();
+    }
+
+    public void OnClickStart()
+    {
+
+        foreach (GameObject piece in children)
+        {
+            piece.GetComponent<BoxCollider2D>().size = new Vector2(0.1f, 0.1f);
+        }
+        player.gameStart();
+    }
+    
+    public void ResetCollider()
+    {
+        GoalPiece.GetComponent<BoxCollider2D>().enabled = true;
+        foreach (GameObject piece in children)
+        {
+            piece.GetComponent<BoxCollider2D>().size = new Vector2(1, 1);
+            piece.GetComponent<BoxCollider2D>().enabled = true;
+        }
+    }
+    public void GameClear()
+    {
+        Initiate.Fade("ResultScene", Color.black, 0.5f);
     }
 }

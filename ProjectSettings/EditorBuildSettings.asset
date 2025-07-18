@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StageSelectionScene.unity
     guid: 890798fe00c76e542a5bedfde08f1df3
+  - enabled: 1
+    path: Assets/Scenes/SlidePuzzleScene.unity
+    guid: 9bfd9301f90e984419e0230d0e12357d
+  - enabled: 1
+    path: Assets/Scenes/ResultScene.unity
+    guid: cd3489f8369fb18488f2c8f540c13129
   m_configObjects: {}

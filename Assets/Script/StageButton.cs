@@ -32,5 +32,6 @@ public class StageButton : MonoBehaviour
 
         Debug.Log($"ステージ {stageNumber} 開始");
         // ステージ開始処理（シーン遷移など）
+        Initiate.Fade("SlidePuzzleScene", Color.black, 0.5f);
     }
 }
