@@ -26,4 +26,8 @@ public class HomeScript : MonoBehaviour
     {
         Initiate.Fade("StageSelectionScene", Color.black, 0.5f);
     }
+    public void GoToProfile()
+    {
+        Initiate.Fade("ProfileScene", Color.black, 0.5f);
+    }
 }

@@ -7,10 +7,11 @@ using static Piece;
 public class SlidePuzzleSceneDirector : MonoBehaviour
 {
     // ピース
-    [SerializeField] List<GameObject> pieceList;
-    [SerializeField] GameObject ParentPieces;
-    [SerializeField] GameObject StartPiece;
-    [SerializeField] GameObject GoalPiece;
+    [SerializeField] List<GameObject> pieceList;//空白ピースを除くピースPrefabのリスト
+    [SerializeField] GameObject emptyPiece;//空白ピースPrefab
+    [SerializeField] GameObject ParentPieces;//ピースをInstantiateする先
+    [SerializeField] GameObject StartPiece;//
+    [SerializeField] GameObject GoalPiece;//
     // ゲームクリア時に表示されるボタン
     [SerializeField]  GameObject buttonRetry;
     [SerializeField] GameObject buttonStart;
@@ -26,15 +27,20 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        int pieceType = 6;//ピース6は空白
         buttonRetry.SetActive(false);
         buttonStart.SetActive(true);
-        for (int i = 0; i < 4; i++)
+        for (int y = 0; y < 4; y++)
         {
-            for(int j = 0; j < 4; j++)
+            for(int x = 0; x < 4; x++)
             {
-                if (i != 3 || j != 3)
+                if (pieceType != 6)
                 {
-                    Object.Instantiate(pieceList[Random.Range(0, 6)], new Vector3(-1.5f + i, 1.5f - j, 0f), Quaternion.identity, ParentPieces.transform);
+                    Object.Instantiate(pieceList[pieceType], new Vector3(-1.5f + x, 1.5f - y, 0f), Quaternion.identity, ParentPieces.transform);
+                }
+                else
+                {
+                    Object.Instantiate(emptyPiece, new Vector3(-1.5f + x, 1.5f - y, 0f), Quaternion.identity, ParentPieces.transform);
                 }
             }
         }
@@ -47,10 +53,10 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
         // 指定回数シャッフル
         for (int i = 0; i < shuffleCount; i++)
         {
-            // 0番と隣接するピース
+            // 空白と隣接するピース
             List<GameObject> movablechildren = new List<GameObject>();
 
-            // 0番と隣接するピースをリストに追加
+            //空白と隣接するピースをリストに追加
             foreach (var item in children)
             {
                 if (GetEmptyPiece(item) != null)
@@ -86,9 +92,9 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
             {
                 // ヒットしたゲームオブジェクト
                 GameObject hitPiece = hit2d.collider.gameObject;
-                // 0番のピースと隣接していればデータが入る
+                // 空白のピースと隣接していればデータが入る
                 GameObject emptyPiece = GetEmptyPiece(hitPiece);
-                // 選んだピースと0番のピースを入れかえる
+                // 選んだピースと空白のピースを入れかえる
                 SwapPiece(hitPiece, emptyPiece);
 
 
@@ -97,14 +103,14 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
         
     }
 
-    // 引数のピースが0番のピースと隣接していたら0番のピースを返す
+    // 引数のピースが空白のピースと隣接していたら空白のピースを返す
     GameObject GetEmptyPiece(GameObject piece)
     {
         // 2点間の距離を代入
         float dist =
             Vector2.Distance(piece.transform.position, children[0].transform.position);
 
-        // 距離が1なら0番のピースを返す（2個以上離れていたり、斜めの場合は1より大きい距離になる）
+        // 距離が1なら空白のピースを返す（2個以上離れていたり、斜めの場合は1より大きい距離になる）
         if (dist == 1)
         {
             return children[0];
