@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,28 +10,42 @@ public class StageSelectManager : MonoBehaviour
     public Text chapterLabel;
     public GameObject stageButtonPrefab;
     public Transform gridParent;
-    public Button prevButton;
-    public Button nextButton;
+    public GameObject lackOfStaminatext;
 
     private int currentChapter = 1;
-    private const int stagesPerChapter = 9;
-    private const int maxChapters = 10; // 最大チャプター数
+    private int maxChapters = 1;
+
+    private List<StageData> allStages = new List<StageData>();
 
     void Start()
     {
-        prevButton.onClick.AddListener(() => ChangeChapter(-1));
-        nextButton.onClick.AddListener(() => ChangeChapter(1));
+        lackOfStaminatext.SetActive(false);
+        // APIからステージ情報を取得
+        StartCoroutine(NetworkManager.Instance.ShowStages(OnStagesLoaded));
+        
+    }
+
+    private void OnStagesLoaded(List<StageData> stages)
+    {
+        if (stages == null || stages.Count == 0)
+        {
+            Debug.LogError("ステージデータが取得できませんでした");
+            return;
+        }
+
+        allStages = stages;
+        maxChapters = stages.Max(s => s.ChapterNum);
 
         UpdateStageGrid();
     }
 
-    void ChangeChapter(int delta)
+    public void ChangeChapter(int delta)
     {
         currentChapter = Mathf.Clamp(currentChapter + delta, 1, maxChapters);
         UpdateStageGrid();
     }
 
-    void UpdateStageGrid()
+    private void UpdateStageGrid()
     {
         chapterLabel.text = $"チャプター {currentChapter}";
 
@@ -38,21 +53,45 @@ public class StageSelectManager : MonoBehaviour
         foreach (Transform child in gridParent)
             Destroy(child.gameObject);
 
-        int startStageNumber = (currentChapter - 1) * stagesPerChapter + 1;
+        // 現在のチャプターのステージデータだけ抽出
+        List<StageData> chapterStages = allStages
+            .Where(s => s.ChapterNum == currentChapter)
+            .OrderBy(s => s.StageNum)
+            .ToList();
 
-        for (int i = 0; i < stagesPerChapter; i++)
+        // アンロック判定用
+        HashSet<int> unlockedStages = new HashSet<int>();
+
+        if (chapterStages.Count > 0)
         {
-            int stageNumber = startStageNumber + i;
+            // チャプター内の最初のステージはデフォルトでアンロック
+            unlockedStages.Add(chapterStages.First().StageId);
+
+            for (int i = 0; i < chapterStages.Count; i++)
+            {
+                StageData stage = chapterStages[i];
+                if (stage.Clear)
+                {
+                    unlockedStages.Add(stage.StageId);
+                    // クリア済みなら次のステージもアンロック
+                    if (i + 1 < chapterStages.Count)
+                        unlockedStages.Add(chapterStages[i + 1].StageId);
+                }
+            }
+        }
+
+        // ボタン生成
+        foreach (StageData stage in chapterStages)
+        {
             GameObject buttonObj = Instantiate(stageButtonPrefab, gridParent);
             StageButton btn = buttonObj.GetComponent<StageButton>();
 
-            bool unlocked = PlayerPrefs.GetInt($"Stage{stageNumber}_Unlocked", 0) == 1 || stageNumber == 1;
-            int starCount = PlayerPrefs.GetInt($"Stage{stageNumber}_Stars", 0);
-            btn.Setup(stageNumber, unlocked, starCount);
-        }
+            bool unlocked = unlockedStages.Contains(stage.StageId);
+            int starCount = stage.Evaluation.HasValue ? stage.Evaluation.Value : 0;
+            bool collectible = stage.Collectibles.HasValue && stage.Collectibles.Value;
 
-        prevButton.interactable = currentChapter > 1;
-        nextButton.interactable = currentChapter < maxChapters;
+            btn.Setup(stage.StageNum, unlocked, starCount, collectible,stage.ChapterNum, stage.StageId, stage.ShuffleCount, stage.reference_value_1,stage.reference_value_2,stage.reference_value_3);
+        }
     }
 
     public void GoToSetiing()
@@ -61,9 +100,19 @@ public class StageSelectManager : MonoBehaviour
         Initiate.Fade("SettingScene", Color.black, 0.5f);
     }
 
+
     public void ReturnHome()
     {
         Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
-}
 
+    public void LackOfStamina()
+    {
+        lackOfStaminatext.SetActive(true);
+    }
+
+    public void closeLackOfStamina()
+    {
+        lackOfStaminatext.SetActive(false);
+    }
+}

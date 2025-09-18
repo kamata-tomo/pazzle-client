@@ -15,6 +15,18 @@ public class StageData
     [JsonProperty("stage_num")]
     public int StageNum { get; set; }
 
+    [JsonProperty("shuffle_count")]
+    public int ShuffleCount { get; set; }
+
+    [JsonProperty("reference_value_1")]
+    public int reference_value_1 { get; set; }
+
+    [JsonProperty("reference_value_2")]
+    public int reference_value_2 { get; set; }
+
+    [JsonProperty("reference_value_3")]
+    public int reference_value_3 { get; set; }
+
     [JsonProperty("clear")]
     public bool Clear { get; set; }
 

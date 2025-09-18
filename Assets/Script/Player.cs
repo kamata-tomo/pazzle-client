@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -67,6 +68,11 @@ public class Player : MonoBehaviour
                 Debug.Log("Goal");
                 return;
             }
+            if (targetPieceSc.collectible)
+            {
+                SlidePuzzleSceneDirector.hideCollectible();
+                StageResultData.Collectible = true;
+            }
             if (playersDirection == EntryPlace.TOP && targetPieceSc.bottom)
             {
                 targetPieceSc.entry = Piece.EntryPlace.BOTTOM;
@@ -87,7 +93,7 @@ public class Player : MonoBehaviour
                 targetPieceSc.entry = Piece.EntryPlace.RIGHT;
                 RotationandDirections(targetPieceSc);
             }
-            else
+            else if(!targetPieceSc.collectible)
             {
                 isMoving = false;
                 Fail = true;
@@ -130,6 +136,7 @@ public class Player : MonoBehaviour
         this.gameObject.transform.position = new Vector3(1.5f, -2.5f, 0f);
         playersDirection = EntryPlace.TOP;
         PlayersAnimator.SetInteger("playersDirection", 0);
+        StageResultData.Collectible = false;
         Fail = false;
         ReadyToStart = true;
         SlidePuzzleSceneDirector.ResetCollider();

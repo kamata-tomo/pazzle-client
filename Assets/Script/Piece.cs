@@ -11,6 +11,7 @@ public class Piece : MonoBehaviour
     public bool left;
     public bool start;
     public bool goal;
+    public bool collectible;
     public EntryPlace entry; 
 
 

@@ -20,6 +20,7 @@ public class NetworkManager : MonoBehaviour
     const string API_BASE_URL = "https://ge202405.japaneast.cloudapp.azure.com/api/";
 #endif
 
+
     private string userName;
     private string apiToken;
 
@@ -45,8 +46,24 @@ public class NetworkManager : MonoBehaviour
     // ユーザー関連
     // ========================================
 
+    // ユーザー存在確認
+    public IEnumerator CheckUserExists(Action<bool> callback)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(API_BASE_URL + "users/show");
+        request.SetRequestHeader("Authorization", "Bearer " + this.apiToken);
+
+        yield return request.SendWebRequest();
+
+        bool exists = false;
+        if (request.result == UnityWebRequest.Result.Success && request.responseCode == 200)
+        {
+            exists = true;
+        }
+        callback?.Invoke(exists);
+    }
+
     // ユーザー登録
-    public IEnumerator RegistUser(string name, Action<RegistUserResponse> callback)
+    public IEnumerator RegistUser(string name, Action<bool> callback)
     {
         RegistUserRequest requestData = new RegistUserRequest { Name = name };
         string json = JsonConvert.SerializeObject(requestData);
@@ -56,6 +73,7 @@ public class NetworkManager : MonoBehaviour
 
         yield return request.SendWebRequest();
 
+        bool isSuccess = false;
         if (request.result == UnityWebRequest.Result.Success && request.responseCode == 200)
         {
             string resultJson = request.downloadHandler.text;
@@ -65,13 +83,12 @@ public class NetworkManager : MonoBehaviour
             this.apiToken = response.APIToken;
             SaveUserData();
 
-            callback?.Invoke(response);
+            isSuccess = true;
         }
-        else
-        {
-            callback?.Invoke(null);
-        }
+
+        callback?.Invoke(isSuccess);
     }
+
 
     // ユーザー情報取得
     public IEnumerator GetUser(Action<ShowUserResponse> callback)
@@ -123,11 +140,26 @@ public class NetworkManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            var response = JsonConvert.DeserializeObject<List<TitleData>>(request.downloadHandler.text);
-            callback?.Invoke(response);
+            var acqs = JsonConvert.DeserializeObject<List<AcquisitionResponse>>(request.downloadHandler.text);
+            var result = new List<TitleData>();
+
+            foreach (var a in acqs)
+            {
+                if (a.Title != null)
+                {
+                    result.Add(new TitleData
+                    {
+                        Id = a.Title.Id,     // ← TitleのIDを使う
+                        Name = a.Title.Name  // ← Titleの名前を使う
+                    });
+                }
+            }
+
+            callback?.Invoke(result);
         }
         else callback?.Invoke(null);
     }
+
 
     // 称号登録
     public IEnumerator StoreTitle(int titleId, Action<bool> callback)
@@ -212,22 +244,41 @@ public class NetworkManager : MonoBehaviour
     }
 
     // スタミナ増減（reason_id指定）
-    public IEnumerator StaminaChangesByReason(int reasonId, int? amount, Action<StaminaData> callback)
+    // NetworkManager.cs 内
+    public IEnumerator StaminaChangesByReason(int reasonId, int? amount,Action<StaminaData> onSuccess,Action<string> onError)
     {
         StaminaChangeRequest req = new StaminaChangeRequest { ReasonId = reasonId, Amount = amount };
         string json = JsonConvert.SerializeObject(req);
 
-        UnityWebRequest request = UnityWebRequest.Post(API_BASE_URL + "users/stamina-changes-by-reasons", json, "application/json");
+        UnityWebRequest request = UnityWebRequest.Post(
+            API_BASE_URL + "users/stamina-changes-by-reasons", json, "application/json");
         request.SetRequestHeader("Authorization", "Bearer " + this.apiToken);
+
         yield return request.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.Success)
+        if (request.result == UnityWebRequest.Result.Success && request.responseCode == 200)
         {
+            // スタミナ正常更新
             var response = JsonConvert.DeserializeObject<StaminaData>(request.downloadHandler.text);
-            callback?.Invoke(response);
+            onSuccess?.Invoke(response);
         }
-        else callback?.Invoke(null);
+        else
+        {
+            // エラーJSONを取得
+            var errorJson = request.downloadHandler.text;
+            string message = "通信エラー";
+            try
+            {
+                var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(errorJson);
+                if (dict != null && dict.ContainsKey("error"))
+                    message = dict["error"]; // "スタミナ不足です" など
+            }
+            catch { }
+
+            onError?.Invoke(message);
+        }
     }
+
 
     // フレンドからスタミナ受け取り
     public IEnumerator ProviderStamina(int friendId, Action<bool> callback)
@@ -241,6 +292,62 @@ public class NetworkManager : MonoBehaviour
 
         callback?.Invoke(request.result == UnityWebRequest.Result.Success);
     }
+
+    // ログインボーナス取得
+    public IEnumerator GetLoginBonus(Action<LoginBonusResponse> callback)
+    {
+        // API: POST /api/login-bonus
+        UnityWebRequest request = UnityWebRequest.PostWwwForm(API_BASE_URL + "login-bonus", "");
+        request.SetRequestHeader("Authorization", "Bearer " + this.apiToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var response = JsonConvert.DeserializeObject<LoginBonusResponse>(request.downloadHandler.text);
+            callback?.Invoke(response);
+        }
+        else
+        {
+            callback?.Invoke(null);
+        }
+    }
+
+    // 他ユーザー全件取得
+    public IEnumerator GetAllOtherUsers(Action<List<OtherUserData>> callback)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(API_BASE_URL + "users/show-others");
+        request.SetRequestHeader("Authorization", "Bearer " + this.apiToken);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var response = JsonConvert.DeserializeObject<List<OtherUserData>>(request.downloadHandler.text);
+            callback?.Invoke(response);
+        }
+        else callback?.Invoke(null);
+    }
+
+    // IDでユーザー取得
+    public IEnumerator GetUserById(int userId, Action<OtherUserData> callback)
+    {
+        var payload = new { user_id = userId };
+        string json = JsonConvert.SerializeObject(payload);
+
+        UnityWebRequest request = UnityWebRequest.Post(
+            API_BASE_URL + "users/show-by-id", json, "application/json");
+        request.SetRequestHeader("Authorization", "Bearer " + this.apiToken);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var response = JsonConvert.DeserializeObject<OtherUserData>(request.downloadHandler.text);
+            callback?.Invoke(response);
+        }
+        else callback?.Invoke(null);
+    }
+
+
 
     // ========================================
     // ステージ関連
@@ -293,7 +400,11 @@ public class NetworkManager : MonoBehaviour
     // ========================================
     private void SaveUserData()
     {
-        SaveData saveData = new SaveData { UserName = this.userName, APIToken = this.apiToken };
+        SaveData saveData = new SaveData
+        {
+            UserName = this.userName,
+            APIToken = this.apiToken,
+        };
         string json = JsonConvert.SerializeObject(saveData);
         File.WriteAllText(Application.persistentDataPath + "/saveData.json", json);
     }

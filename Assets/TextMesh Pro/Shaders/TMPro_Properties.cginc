@@ -61,7 +61,7 @@ uniform float		_ScaleRatioC;
 uniform float		_VertexOffsetX;
 uniform float		_VertexOffsetY;
 
-//uniform float		_UseClipRect;
+//uniform float		_UseRect;
 uniform float		_MaskID;
 uniform sampler2D	_MaskTex;
 uniform float4		_MaskCoord;
