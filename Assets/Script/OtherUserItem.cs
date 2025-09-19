@@ -9,6 +9,8 @@ public class OtherUserItem : MonoBehaviour
     public Button requestButton;
     public Transform titleGridParent;
     public GameObject titleIconPrefab;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
 
     private int userId;
     private ProfileManager manager;
@@ -41,6 +43,7 @@ public class OtherUserItem : MonoBehaviour
 
     public void OnRequest()
     {
+        GameObject.Find("SE").GetComponent<AudioSource>().PlayOneShot(ButtonSoundEffect);
         StartCoroutine(NetworkManager.Instance.StoreFriendRequest(userId, (success) =>
         {
             if (success) manager.ReloadOthers();

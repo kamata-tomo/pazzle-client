@@ -14,9 +14,13 @@ public class ResultManager : MonoBehaviour
 {
     [SerializeField] GameObject CLEARtext;
     [SerializeField] GameObject FAILUREtext;
+    [SerializeField] AudioSource bgm;
+    [SerializeField] AudioSource se;
+    [SerializeField] AudioClip ButtonSoundEffect;
 
     void Start()
     {
+        bgm.Play();
         // クリア情報をサーバーに送信（評価が0なら送らない）
         if (StageResultData.Evaluation > 0)
         {
@@ -47,16 +51,19 @@ public class ResultManager : MonoBehaviour
 
     public void GoTohome()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
 
     public void GoToStageSelection()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("StageSelectionScene", Color.black, 0.5f);
     }
 
     public void ReturnGame()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("SlidePuzzleScene", Color.black, 0.5f);
     }
 }

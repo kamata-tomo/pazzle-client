@@ -9,6 +9,9 @@ public class FriendItem : MonoBehaviour
     public Transform titleGridParent; // Grid (3x3) でタイトルアイコン配置
     public GameObject titleIconPrefab; // Image付きPrefab
 
+    [SerializeField] AudioClip ButtonSoundEffect;
+
+
     private int friendId;
     private ProfileManager manager;
 
@@ -36,6 +39,7 @@ public class FriendItem : MonoBehaviour
 
     public void OnSendStamina()
     {
+        GameObject.Find("SE").GetComponent<AudioSource>().PlayOneShot(ButtonSoundEffect);
         StartCoroutine(NetworkManager.Instance.ProviderStamina(friendId, (success) =>
         {
             if (success) manager.ReloadFriends();

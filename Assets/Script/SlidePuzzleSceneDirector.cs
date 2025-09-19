@@ -33,14 +33,21 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     [SerializeField] Text replaceCountText;
     [SerializeField] Transform markerParent;
 
+    [SerializeField] AudioSource bgm;
+    [SerializeField] AudioSource se;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
     List<GameObject> children;
     private List<StageCellData> OnCellsLoaded;
     private GameObject currentEmptyPiece; // 空白ピースを保持する変数
     private int ReplaceCount;
     private GameObject InstantiatecollectiblePiece;
 
+
+
     void Start()
     {
+        bgm.Play();
         StageResultData.Collectible =false;
         int stageId = StageSelectData.SelectedStageId;
         Debug.Log("受け取ったステージID: " + stageId);
@@ -243,6 +250,7 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     // リトライボタン
     public void OnClickRetry()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         foreach (Transform collectible in collectibleParentPiece.transform)
         {
             collectible.gameObject.SetActive(true);
@@ -260,8 +268,8 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
 public void OnClickStart()
     {
         // 子オブジェクトを正しくGameObjectとして扱う
-        
 
+        se.PlayOneShot(ButtonSoundEffect);
         foreach (GameObject piece in children)
         {
             if (piece.CompareTag("piece")) // GetComponent<GameObject>() は不要

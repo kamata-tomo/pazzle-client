@@ -159,15 +159,18 @@ public class HomeScript : MonoBehaviour
     }
     public void GoToSetiing()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         SetiingManagerScript.SceneReturnTarget = SceneManager.GetActiveScene().name;
         Initiate.Fade("SettingScene", Color.black, 0.5f);
     }
     public void GoToStageSelection()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("StageSelectionScene", Color.black, 0.5f);
     }
     public void GoToProfile()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("ProfileScene", Color.black, 0.5f);
     }
 }

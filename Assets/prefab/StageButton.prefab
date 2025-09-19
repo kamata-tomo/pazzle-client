@@ -724,3 +724,4 @@ MonoBehaviour:
   - {fileID: 5361278583372876817}
   - {fileID: 3575659835078536382}
   collectibleIcon: {fileID: 2978591446484572452}
+  ButtonSoundEffect: {fileID: 8300000, guid: 3308b584549db0d44bf5045defd0f904, type: 3}

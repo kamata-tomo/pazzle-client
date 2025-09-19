@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,8 @@ public class StageButton : MonoBehaviour
     [SerializeField] GameObject lockIcon;
     [SerializeField] GameObject[] stars;
     [SerializeField] GameObject collectibleIcon;
+
+    [SerializeField] AudioClip ButtonSoundEffect;
 
     private int stageNumber;
     private int stageId;
@@ -40,6 +43,7 @@ public class StageButton : MonoBehaviour
 
     public void OnClick()
     {
+        GameObject.Find("SE").GetComponent<AudioSource>().PlayOneShot(ButtonSoundEffect);
         if (!isUnlocked) return;
         NetworkManager.Instance.StaminaAutoRecovery((stamina) => {
             if (stamina != null)

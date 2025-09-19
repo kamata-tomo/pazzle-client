@@ -8,6 +8,8 @@ public class FriendRequestItem : MonoBehaviour
     public Text levelText;
     public Transform titleGridParent;
     public GameObject titleIconPrefab;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
 
     private int requesterId;
     private ProfileManager manager;
@@ -35,6 +37,7 @@ public class FriendRequestItem : MonoBehaviour
 
     public void OnAccept()
     {
+        GameObject.Find("SE").GetComponent<AudioSource>().PlayOneShot(ButtonSoundEffect);
         StartCoroutine(NetworkManager.Instance.StoreFriend(requesterId, (success) =>
         {
             if (success) manager.ReloadRequests();

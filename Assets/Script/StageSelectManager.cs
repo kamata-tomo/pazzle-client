@@ -12,6 +12,10 @@ public class StageSelectManager : MonoBehaviour
     public Transform gridParent;
     public GameObject lackOfStaminatext;
 
+    [SerializeField] AudioSource bgm;
+    [SerializeField] AudioSource se;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
     private int currentChapter = 1;
     private int maxChapters = 1;
 
@@ -19,6 +23,7 @@ public class StageSelectManager : MonoBehaviour
 
     void Start()
     {
+        bgm.Play();
         lackOfStaminatext.SetActive(false);
         // APIからステージ情報を取得
         StartCoroutine(NetworkManager.Instance.ShowStages(OnStagesLoaded));
@@ -41,6 +46,8 @@ public class StageSelectManager : MonoBehaviour
 
     public void ChangeChapter(int delta)
     {
+
+        se.PlayOneShot(ButtonSoundEffect);
         currentChapter = Mathf.Clamp(currentChapter + delta, 1, maxChapters);
         UpdateStageGrid();
     }
@@ -96,6 +103,7 @@ public class StageSelectManager : MonoBehaviour
 
     public void GoToSetiing()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         SetiingManagerScript.SceneReturnTarget = SceneManager.GetActiveScene().name;
         Initiate.Fade("SettingScene", Color.black, 0.5f);
     }
@@ -103,6 +111,7 @@ public class StageSelectManager : MonoBehaviour
 
     public void ReturnHome()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
 

@@ -454,6 +454,7 @@ MonoBehaviour:
   titleGridParent: {fileID: 2828322820047760697}
   titleIconPrefab: {fileID: 6248474511529757676, guid: d3cc8a1beec37814b9fb0e7e080753de,
     type: 3}
+  ButtonSoundEffect: {fileID: 8300000, guid: 3308b584549db0d44bf5045defd0f904, type: 3}
 --- !u!114 &1106544401467332718
 MonoBehaviour:
   m_ObjectHideFlags: 0

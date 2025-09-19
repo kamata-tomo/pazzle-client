@@ -13,12 +13,17 @@ public class SetiingManagerScript : MonoBehaviour
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider seSlider;
 
+    [SerializeField] AudioSource Bgm;
+    [SerializeField] AudioSource se;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
     private const string MASTER_KEY = "Master";
     private const string BGM_KEY = "BGMVolume";
     private const string SE_KEY = "SEVolume";
 
     private void Start()
     {
+        Bgm.Play();
         // 値をロードしてスライダーとミキサーに反映
         float master = PlayerPrefs.GetFloat(MASTER_KEY, 0f);
         float bgm = PlayerPrefs.GetFloat(BGM_KEY, 0f);
@@ -40,6 +45,7 @@ public class SetiingManagerScript : MonoBehaviour
 
     public void ReturnScene()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade(SceneReturnTarget, Color.black, 0.5f);
         PlayerPrefs.Save();
     }

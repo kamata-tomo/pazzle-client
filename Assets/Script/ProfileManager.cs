@@ -39,14 +39,24 @@ public class ProfileManager : MonoBehaviour
     public Transform myTitlesGridParent;
     public GameObject titleIconPrefab;
 
+    [SerializeField] AudioSource bgm;
+    [SerializeField] AudioSource se;
+    [SerializeField] AudioClip ButtonSoundEffect;
+
+    [Header("Change Name Window")]
+    public GameObject changeNameWindow;
+    public InputField inputFieldNewName;
+
     private void Start()
     {
         ShowProfile();
+        bgm.Play();
     }
 
     // ==== パネル切り替え ====
     public void ShowProfile()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         profilePanel.SetActive(true);
         friendsPanel.SetActive(false);
         requestsPanel.SetActive(false);
@@ -57,6 +67,7 @@ public class ProfileManager : MonoBehaviour
 
     public void ShowFriends()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         profilePanel.SetActive(false);
         friendsPanel.SetActive(true);
         requestsPanel.SetActive(false);
@@ -67,6 +78,7 @@ public class ProfileManager : MonoBehaviour
 
     public void ShowRequests()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         profilePanel.SetActive(false);
         friendsPanel.SetActive(false);
         requestsPanel.SetActive(true);
@@ -77,6 +89,7 @@ public class ProfileManager : MonoBehaviour
 
     public void ShowOthers()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         profilePanel.SetActive(false);
         friendsPanel.SetActive(false);
         requestsPanel.SetActive(false);
@@ -129,6 +142,42 @@ public class ProfileManager : MonoBehaviour
         });
     }
 
+    // ==== 名前変更UI制御 ====
+    public void OnClickChangeName()
+    {
+        se.PlayOneShot(ButtonSoundEffect);
+        changeNameWindow.SetActive(true); // ウィンドウ表示
+    }
+
+    public void OnClickCloseChangeName()
+    {
+        se.PlayOneShot(ButtonSoundEffect);
+        changeNameWindow.SetActive(false); // ウィンドウ非表示
+    }
+
+    public void OnClickUpdateName()
+    {
+        se.PlayOneShot(ButtonSoundEffect);
+        string newName = inputFieldNewName.text.Trim();
+        if (string.IsNullOrEmpty(newName)) return;
+
+        // experience と item_quantity は更新しないので null を渡す
+        StartCoroutine(NetworkManager.Instance.UpdateUser(newName, null, null, (response) =>
+        {
+            if (response != null)
+            {
+                // 成功したらプロフィールを再読み込み
+                StartCoroutine(LoadMyProfile());
+                changeNameWindow.SetActive(false);
+            }
+            else
+            {
+                Debug.LogError("名前の更新に失敗しました");
+            }
+        }));
+    }
+
+
     // ==== リストロード ====
     private IEnumerator LoadFriends()
     {
@@ -179,6 +228,7 @@ public class ProfileManager : MonoBehaviour
     // ==== 検索処理 ====
     public void OnSearchUser()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         int id;
         if (!int.TryParse(searchInput.text, out id)) return;
         StartCoroutine(SearchUserById(id));
@@ -217,6 +267,7 @@ public class ProfileManager : MonoBehaviour
     // ==== 戻るボタン ====
     public void ReturnHome()
     {
+        se.PlayOneShot(ButtonSoundEffect);
         Initiate.Fade("HomeScenes", Color.black, 0.5f);
     }
 }
