@@ -17,7 +17,8 @@ public class NetworkManager : MonoBehaviour
 #if DEBUG
     const string API_BASE_URL = "http://localhost:8000/api/";
 #else
-    const string API_BASE_URL = "https://ge202405.japaneast.cloudapp.azure.com/api/";
+    const string API_BASE_URL = "http://ge202405.japaneast.cloudapp.azure.com/api/";
+
 #endif
 
 
@@ -40,6 +41,18 @@ public class NetworkManager : MonoBehaviour
             }
             return instance;
         }
+    }
+
+    // 🔹 Awakeで二重生成を防止
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     // ========================================
@@ -106,7 +119,7 @@ public class NetworkManager : MonoBehaviour
     }
 
     // ユーザー情報更新
-    public IEnumerator UpdateUser(string name, int? experience, int? item_quantity, Action<ShowUserResponse> callback)
+        public IEnumerator UpdateUser(string name, int? experience, int? item_quantity, Action<ShowUserResponse> callback)
     {
         UpdateUserRequest requestData = new UpdateUserRequest();
         if (name != null) requestData.Name = name;
