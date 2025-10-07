@@ -36,6 +36,7 @@ public class ProfileManager : MonoBehaviour
     [Header("Profile UI")]
     public Text userNameText;
     public Text userLevelText;
+    public Text userIdText;
     public Transform myTitlesGridParent;
     public GameObject titleIconPrefab;
 
@@ -109,6 +110,7 @@ public class ProfileManager : MonoBehaviour
             // 名前・レベル表示
             userNameText.text = user.Name;
             userLevelText.text = $"Lv.{user.Level}";
+            userIdText.text = $"ID.{user.Id}";
 
             // 経験値バー更新
             UpdateExpBar(user);
