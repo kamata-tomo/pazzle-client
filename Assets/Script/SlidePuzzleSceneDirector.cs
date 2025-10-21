@@ -24,10 +24,8 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
     [SerializeField] GameObject GoalPiece;//
     [SerializeField] GameObject collectiblePiece;
     [SerializeField] GameObject collectibleParentPiece;
-    // ゲームクリア時に表示されるボタン
     [SerializeField]  GameObject buttonRetry;
     [SerializeField] GameObject buttonStart;
-    // シャッフル回数
     [SerializeField] Player player;
     [SerializeField] Slider evaluationSlider;
     [SerializeField] Text replaceCountText;
@@ -206,7 +204,6 @@ public class SlidePuzzleSceneDirector : MonoBehaviour
         GameObject marker = new GameObject("Marker_" + label);
         marker.transform.SetParent(markerParent, false);
 
-        // RectTransformを追加してサイズを十分に確保
         RectTransform rt = marker.AddComponent<RectTransform>();
         rt.sizeDelta = new Vector2(300, 0); 
 

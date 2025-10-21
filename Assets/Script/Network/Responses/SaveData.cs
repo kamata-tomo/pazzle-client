@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// SaveData.cs
 using Newtonsoft.Json;
 
 public class SaveData

@@ -26,7 +26,6 @@ public class TitleManagerScript : MonoBehaviour
         bgm.Play();
     }
 
-    // Update is called once per frame
     void Update()
     {
         

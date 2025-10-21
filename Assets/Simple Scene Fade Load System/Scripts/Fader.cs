@@ -133,7 +133,6 @@ public class Fader : MonoBehaviour
     void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
         StartCoroutine(FadeIt());
-        //We can now fade in
         isFadeIn = true;
     }
 }

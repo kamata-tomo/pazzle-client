@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// AcquisitionResponse.cs
 using Newtonsoft.Json;
 
 public class AcquisitionResponse

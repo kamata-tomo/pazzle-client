@@ -8,9 +8,6 @@ using UnityEngine.Networking;
 
 /// <summary>
 /// APIとの通信を管理するクラス
-/// - 全てのAPIエンドポイントに対応
-/// - 通信はIEnumerator + コールバック(Action<T>)形式
-/// - 成功時はJSONをパースして返す
 /// </summary>
 public class NetworkManager : MonoBehaviour
 {
@@ -257,7 +254,6 @@ public class NetworkManager : MonoBehaviour
     }
 
     // スタミナ増減（reason_id指定）
-    // NetworkManager.cs 内
     public IEnumerator StaminaChangesByReason(int reasonId, int? amount,Action<StaminaData> onSuccess,Action<string> onError)
     {
         StaminaChangeRequest req = new StaminaChangeRequest { ReasonId = reasonId, Amount = amount };
@@ -306,7 +302,7 @@ public class NetworkManager : MonoBehaviour
         callback?.Invoke(request.result == UnityWebRequest.Result.Success);
     }
 
-    // ログインボーナス取得
+    // ログインボーナス取得(APIのみ実装) 
     public IEnumerator GetLoginBonus(Action<LoginBonusResponse> callback)
     {
         // API: POST /api/login-bonus

@@ -28,7 +28,7 @@ public class HomeScript : MonoBehaviour
         // ★ ホームに戻るたびに称号チェックを実行
         StartCoroutine(CheckAndRegisterTitles());
         // スタミナの定期回復チェック
-        InvokeRepeating(nameof(CallStaminaRecovery), 300f, 300f);
+        InvokeRepeating(nameof(CallStaminaRecovery), 60f, 60f);
     }
 
     /// <summary>

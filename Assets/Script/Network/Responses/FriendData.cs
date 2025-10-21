@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// FriendData.cs
 using Newtonsoft.Json;
 
 public class FriendData
