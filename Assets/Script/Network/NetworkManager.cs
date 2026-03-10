@@ -12,9 +12,10 @@ using UnityEngine.Networking;
 public class NetworkManager : MonoBehaviour
 {
 #if DEBUG
-    const string API_BASE_URL = "http://localhost:8000/api/";
+    //const string API_BASE_URL = "http://localhost:8000/api/";
+    const string API_BASE_URL = "http://ge202400.japaneast.cloudapp.azure.com:22222/api/";
 #else
-    const string API_BASE_URL = "http://ge202405.japaneast.cloudapp.azure.com/api/";
+    const string API_BASE_URL = "http://ge202400.japaneast.cloudapp.azure.com:22222/api/";
 
 #endif
 
